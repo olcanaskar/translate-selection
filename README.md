@@ -3,11 +3,11 @@
 **Select text. Translate it without leaving the page.**
 
 [**Download the latest release**](https://github.com/olcanaskar/translate-selection/releases/latest/download/translate-selection.zip) ·
-[Privacy Policy](https://olcanaskar.github.io/translate-selection/privacy.html) ·
+[Privacy Policy](PRIVACY.md) ·
 [Report an issue](https://github.com/olcanaskar/translate-selection/issues)
 
 <p align="center">
-  <img src="docs/screenshot-light.png" alt="Translate Selection translation card" width="100%" />
+  <img src="assets/screenshot-light.png" alt="Translate Selection translation card" width="100%" />
 </p>
 
 Translate Selection is a free, open-source translation extension for Brave,
@@ -79,7 +79,7 @@ request a translation. The extension does not run analytics, display ads, or
 store selected text on a developer server. Your target-language preference is
 stored in browser sync storage.
 
-Read the full [Privacy Policy](https://olcanaskar.github.io/translate-selection/privacy.html).
+Read the full [Privacy Policy](PRIVACY.md).
 
 ## FAQ
 

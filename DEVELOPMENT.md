@@ -20,7 +20,8 @@ This document is for contributors. End-user installation instructions are in
 - `languages.js` — shared alphabetically sorted language list
 - `options.html`, `options.css`, `options.js` — settings page
 - `icons/` — extension icons
-- `docs/` — GitHub Pages landing page, privacy policy, screenshots
+- `assets/` — screenshots used by the README
+- `PRIVACY.md` — privacy policy
 - `test/harness.html` — UI test page that calls the real endpoint with a local
   fallback
 - `test/live.html` — end-to-end test page when the real extension is loaded
