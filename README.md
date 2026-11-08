@@ -139,3 +139,7 @@ checks that the UI still renders on pages with a strict CSP.
 ## License
 
 MIT
+
+## Privacy
+
+Read the [Privacy Policy](https://olcanaskar.github.io/translate-selection/privacy.html).
