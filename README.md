@@ -7,8 +7,7 @@
 [Report an issue](https://github.com/olcanaskar/translate-selection/issues)
 
 <p align="center">
-  <img src="docs/screenshot-dark.png" alt="Translate Selection dark theme" width="49%" />
-  <img src="docs/screenshot-light.png" alt="Translate Selection light theme" width="49%" />
+  <img src="docs/screenshot-light.png" alt="Translate Selection translation card" width="100%" />
 </p>
 
 Translate Selection is a free, open-source translation extension for Brave,
@@ -38,8 +37,8 @@ The interface is English. The default target language is **Turkish**.
 
 ### Brave, Chrome, or Edge (free GitHub release)
 
-> This project is distributed through GitHub Releases instead of the Chrome Web
-> Store. Installation takes about a minute and does not require a paid account.
+> This project is distributed as a free GitHub release. Installation takes
+> about a minute and does not require a store account.
 
 1. [**Download the latest release ZIP**](https://github.com/olcanaskar/translate-selection/releases/latest/download/translate-selection.zip).
 2. Extract the ZIP to a folder you will keep, for example
@@ -89,8 +88,9 @@ Yes. The source code is on GitHub and the installable package is a free GitHub
 release.
 
 **Why is it not on the Chrome Web Store?**
-The Chrome Web Store requires a paid developer registration. This project is
-distributed directly through GitHub Releases instead.
+The project is distributed directly through GitHub Releases so releases stay
+independent and free. You install it once from the release ZIP and update it
+from GitHub.
 
 **Does it work in Brave, Chrome, and Edge?**
 Yes. It uses Manifest V3 and works in Chromium-based desktop browsers.
