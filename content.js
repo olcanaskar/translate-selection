@@ -329,6 +329,12 @@
       user-select: text;
     }
 
+    .st-alt-empty {
+      color: #80868b;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
     .st-loading {
       display: flex;
       align-items: center;
@@ -443,6 +449,10 @@
         color: #e8eaed;
       }
 
+      .st-alt-empty {
+        color: #9aa0a6;
+      }
+
       .st-btn {
         color: #9aa0a6;
       }
@@ -509,6 +519,11 @@
 
   function normalize(text) {
     return String(text || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function isSingleWord(text) {
+    const value = normalize(text);
+    return Boolean(value) && !/\s/.test(value);
   }
 
   function isValidSelection(text) {
@@ -909,7 +924,15 @@
   function renderAlternatives(groups) {
     els.altsList.textContent = '';
     if (!Array.isArray(groups) || groups.length === 0) {
-      els.alts.hidden = true;
+      if (isSingleWord(lastText)) {
+        const empty = document.createElement('div');
+        empty.className = 'st-alt-empty';
+        empty.textContent = 'No other meanings available for this word.';
+        els.altsList.appendChild(empty);
+        els.alts.hidden = false;
+      } else {
+        els.alts.hidden = true;
+      }
       return;
     }
 

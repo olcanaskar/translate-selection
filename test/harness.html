@@ -54,12 +54,11 @@
   <body>
     <h1>Translate Selection — test page</h1>
     <p class="note">
-      This page is for development only and
-      <strong>does not produce real translations</strong>. It returns a sample
-      result based on the selected text; the mock target language is Turkish.
-      Select the text below, click the “Translate” button, and the in-page
-      translation card should appear. Single-word selections also show sample
-      alternative meanings.
+      This page is for development only. It calls the same Google Translate
+      endpoint as the extension and falls back to a local sample if the request
+      fails. Select the text below, click the “Translate” button, and the
+      in-page translation card should appear. Single-word selections also show
+      other meanings when available.
     </p>
 
     <p id="p1">
@@ -312,27 +311,118 @@
         return map[key] || [];
       }
 
+      function parseRealAlternatives(data, primary, source) {
+        const posNames = {
+          isim: 'noun',
+          fiil: 'verb',
+          sıfat: 'adjective',
+          zarf: 'adverb',
+          zamir: 'pronoun',
+          edat: 'preposition',
+          bağlaç: 'conjunction',
+          ünlem: 'interjection'
+        };
+        const seen = new Set(
+          [primary, source]
+            .map((value) => String(value || '').trim().toLocaleLowerCase())
+            .filter(Boolean)
+        );
+        const groups = [];
+        const entries = Array.isArray(data?.[1]) ? data[1] : [];
+
+        for (const entry of entries) {
+          if (!Array.isArray(entry)) continue;
+          const words = [];
+          for (const meaning of Array.isArray(entry[1]) ? entry[1] : []) {
+            if (typeof meaning !== 'string') continue;
+            const word = meaning.trim();
+            const key = word.toLocaleLowerCase();
+            if (!word || seen.has(key)) continue;
+            seen.add(key);
+            words.push(word);
+            if (seen.size >= 61) break;
+          }
+          if (words.length) {
+            const pos = String(entry[0] || 'Meaning');
+            groups.push({
+              pos: posNames[pos.toLocaleLowerCase()] || pos,
+              words
+            });
+          }
+        }
+
+        return groups;
+      }
+
+      async function requestReal(text, targetLang) {
+        const singleWord = Boolean(normalize(text)) && !/\s/.test(normalize(text));
+        const url = new URL('https://translate.googleapis.com/translate_a/single');
+        url.searchParams.set('client', 'gtx');
+        url.searchParams.set('sl', 'auto');
+        url.searchParams.set('tl', targetLang || 'tr');
+        url.searchParams.append('dt', 't');
+        if (singleWord) url.searchParams.append('dt', 'bd');
+        url.searchParams.set('q', text);
+
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+        try {
+          const response = await fetch(url.toString(), { signal: controller.signal });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const data = await response.json();
+          const translated = Array.isArray(data?.[0])
+            ? data[0]
+                .map((part) => (Array.isArray(part) ? part[0] || '' : ''))
+                .join('')
+                .trim()
+            : '';
+          if (!translated) throw new Error('Empty translation');
+          return {
+            translated,
+            detected: typeof data?.[2] === 'string' ? data[2] : 'en',
+            alternatives: singleWord
+              ? parseRealAlternatives(data, translated, normalize(text))
+              : []
+          };
+        } finally {
+          clearTimeout(timeout);
+        }
+      }
+
+      async function realTranslate(text, targetLang) {
+        try {
+          return await requestReal(text, targetLang);
+        } catch (error) {
+          await new Promise((resolve) => setTimeout(resolve, 250));
+          return requestReal(text, targetLang);
+        }
+      }
+
       window.chrome = {
         runtime: {
           id: 'test-extension',
           lastError: null,
           sendMessage(message, callback) {
             if (message.type === 'translate') {
-              setTimeout(() => {
-                const selected = normalize(message.text);
-                const key = selected
-                  .toLowerCase()
-                  .replace(/^[.,!?;:'"“”()\[\]]+|[.,!?;:'"“”()\[\]]+$/g, '');
-                const singleWord = Boolean(selected) && !/\s/.test(selected);
-                const targetLang = message.targetLang || 'tr';
-                callback({
-                  translated: mockTranslate(message.text, targetLang),
-                  detected: 'en',
-                  alternatives: singleWord
-                    ? mockAlternatives(targetLang, key)
-                    : []
+              const targetLang = message.targetLang || 'tr';
+              realTranslate(message.text, targetLang)
+                .then((result) => callback(result))
+                .catch(() => {
+                  setTimeout(() => {
+                    const selected = normalize(message.text);
+                    const key = selected
+                      .toLowerCase()
+                      .replace(/^[.,!?;:'"“”()\[\]]+|[.,!?;:'"“”()\[\]]+$/g, '');
+                    const singleWord = Boolean(selected) && !/\s/.test(selected);
+                    callback({
+                      translated: mockTranslate(message.text, targetLang),
+                      detected: 'en',
+                      alternatives: singleWord
+                        ? mockAlternatives(targetLang, key)
+                        : []
+                    });
+                  }, 300);
                 });
-              }, 350);
             } else if (message.type === 'openTab') {
               if (callback) callback();
             }

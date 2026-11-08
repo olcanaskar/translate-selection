@@ -81,7 +81,8 @@ Changes on the settings page are saved automatically.
 - `options.html/css/js`: Settings page.
 - `icons/`: Extension icons.
 - `docs/preview.png`: Screenshot used in this README.
-- `test/harness.html`: Local UI test page with a mocked `chrome` API.
+- `test/harness.html`: Local UI test page that calls the same Google endpoint
+  and falls back to sample data if the request fails.
 - `test/live.html`: End-to-end test page with the real extension loaded.
 - `test/live-csp.html`: Verifies the UI on pages with a strict Content Security
   Policy.
@@ -114,7 +115,8 @@ node --check options.js
 ```
 
 UI test: open `test/harness.html` and click **Select the text automatically**.
-That page uses a mocked `chrome` API and does not require the extension to be
+That page calls the same Google endpoint as the extension and falls back to
+sample data if the request fails; it does not require the extension to be
 installed.
 
 For a real extension test, start a small local server from the project folder:
