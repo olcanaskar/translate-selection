@@ -68,6 +68,8 @@ To change the shortcut, use `brave://extensions/shortcuts` (or
 - **Automatic open:** When off, a small button appears next to the selection.
   When on, the translation card opens immediately after selecting text.
 
+Changes on the settings page are saved automatically.
+
 ## How it works
 
 - `manifest.json`: Manifest V3 definition.

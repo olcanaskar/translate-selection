@@ -164,23 +164,152 @@
         ]
       ]);
 
+      const MOCK_WORDS_BY_LANG = {
+        de: {
+          the: 'der/die/das', quick: 'schnell', brown: 'braun', fox: 'Fuchs',
+          jumps: 'springt', over: 'über', lazy: 'faul', dog: 'Hund',
+          this: 'dieser', sentence: 'Satz', is: 'ist', here: 'hier', to: 'zu',
+          test: 'testen', inline: 'inline', translation: 'Übersetzung',
+          translations: 'Übersetzungen', card: 'Karte', select: 'auswählen',
+          a: 'ein', word: 'Wort', phrase: 'Ausdruck', or: 'oder', whole: 'ganz',
+          paragraph: 'Absatz', and: 'und', press: 'drücken', blue: 'blau',
+          button: 'Schaltfläche', appear: 'erscheinen', in: 'in', small: 'klein',
+          next: 'neben', selection: 'Auswahl', should: 'sollte', stay: 'bleiben',
+          inside: 'innerhalb', viewport: 'Ansichtsfenster', must: 'muss',
+          not: 'nicht', open: 'öffnen', new: 'neuer', tab: 'Tab', you: 'Sie',
+          can: 'können', copy: 'kopieren', result: 'Ergebnis', close: 'schließen',
+          it: 'es', on: 'auf', google: 'Google', translate: 'übersetzen'
+        },
+        fr: {
+          the: 'le/la/les', quick: 'rapide', brown: 'brun', fox: 'renard',
+          jumps: 'saute', over: 'par-dessus', lazy: 'paresseux', dog: 'chien',
+          this: 'cette', sentence: 'phrase', is: 'est', here: 'ici', to: 'à',
+          test: 'tester', inline: 'intégré', translation: 'traduction',
+          translations: 'traductions', card: 'carte', select: 'sélectionner',
+          a: 'un', word: 'mot', phrase: 'expression', or: 'ou', whole: 'tout',
+          paragraph: 'paragraphe', and: 'et', press: 'appuyer', blue: 'bleu',
+          button: 'bouton', appear: 'apparaître', in: 'dans', small: 'petite',
+          next: 'à côté de', selection: 'sélection', should: 'devrait',
+          stay: 'rester', inside: 'à l’intérieur', viewport: 'fenêtre',
+          must: 'doit', not: 'ne pas', open: 'ouvrir', new: 'nouvel',
+          tab: 'onglet', you: 'vous', can: 'pouvez', copy: 'copier',
+          result: 'résultat', close: 'fermer', it: 'le', on: 'sur',
+          google: 'Google', translate: 'traduire'
+        },
+        es: {
+          the: 'el/la', quick: 'rápido', brown: 'marrón', fox: 'zorro',
+          jumps: 'salta', over: 'por encima de', lazy: 'perezoso', dog: 'perro',
+          this: 'esta', sentence: 'frase', is: 'es', here: 'aquí', to: 'a',
+          test: 'probar', inline: 'integrada', translation: 'traducción',
+          translations: 'traducciones', card: 'tarjeta', select: 'seleccionar',
+          a: 'un', word: 'palabra', phrase: 'frase', or: 'o', whole: 'todo',
+          paragraph: 'párrafo', and: 'y', press: 'pulsar', blue: 'azul',
+          button: 'botón', appear: 'aparecer', in: 'en', small: 'pequeña',
+          next: 'junto a', selection: 'selección', should: 'debería',
+          stay: 'quedarse', inside: 'dentro', viewport: 'ventana',
+          must: 'debe', not: 'no', open: 'abrir', new: 'nueva',
+          tab: 'pestaña', you: 'puedes', can: 'puedes', copy: 'copiar',
+          result: 'resultado', close: 'cerrar', it: 'lo', on: 'en',
+          google: 'Google', translate: 'traducir'
+        }
+      };
+
+      const MOCK_ALTERNATIVES_BY_LANG = {
+        de: {
+          quick: [{ pos: 'adjective', words: ['rasch', 'flink', 'zügig'] }],
+          word: [{ pos: 'noun', words: ['Ausdruck', 'Vokabel'] }],
+          select: [{ pos: 'verb', words: ['wählen', 'selektieren'] }]
+        },
+        fr: {
+          quick: [{ pos: 'adjective', words: ['vite', 'prompt'] }],
+          word: [{ pos: 'noun', words: ['terme', 'parole'] }],
+          select: [{ pos: 'verb', words: ['choisir', 'sélectionner'] }]
+        },
+        es: {
+          quick: [{ pos: 'adjective', words: ['veloz', 'pronto'] }],
+          word: [{ pos: 'noun', words: ['término', 'vocablo'] }],
+          select: [{ pos: 'verb', words: ['elegir', 'seleccionar'] }]
+        },
+        en: {
+          quick: [{ pos: 'adjective', words: ['fast', 'rapid', 'swift'] }],
+          word: [{ pos: 'noun', words: ['term', 'expression'] }]
+        }
+      };
+
+      const FULL_TRANSLATIONS_BY_LANG = {
+        tr: FULL_TRANSLATIONS,
+        de: new Map([
+          [
+            normalize(document.getElementById('p1').textContent),
+            'Der schnelle braune Fuchs springt über den faulen Hund. Dieser Satz testet die Übersetzungskarte auf der Seite. Wählen Sie ein Wort, einen Ausdruck oder den ganzen Absatz und drücken Sie die blaue Schaltfläche.'
+          ],
+          [
+            normalize(document.getElementById('p2').textContent),
+            'Übersetzungen erscheinen in einer kleinen Karte neben der Auswahl. Die Karte sollte im Ansichtsfenster bleiben und keinen neuen Tab öffnen. Sie können das Ergebnis kopieren, die Karte schließen oder sie in Google Übersetzer öffnen.'
+          ]
+        ]),
+        fr: new Map([
+          [
+            normalize(document.getElementById('p1').textContent),
+            'Le renard brun rapide saute par-dessus le chien paresseux. Cette phrase sert à tester la carte de traduction intégrée. Sélectionnez un mot, une expression ou tout le paragraphe, puis appuyez sur le bouton bleu.'
+          ],
+          [
+            normalize(document.getElementById('p2').textContent),
+            'Les traductions apparaissent dans une petite carte à côté de la sélection. La carte doit rester dans la fenêtre et ne pas ouvrir de nouvel onglet. Vous pouvez copier le résultat, fermer la carte ou l’ouvrir dans Google Traduction.'
+          ]
+        ]),
+        es: new Map([
+          [
+            normalize(document.getElementById('p1').textContent),
+            'El rápido zorro marrón salta sobre el perro perezoso. Esta frase sirve para probar la tarjeta de traducción integrada. Selecciona una palabra, una frase o todo el párrafo y pulsa el botón azul.'
+          ],
+          [
+            normalize(document.getElementById('p2').textContent),
+            'Las traducciones aparecen en una pequeña tarjeta junto a la selección. La tarjeta debe permanecer dentro de la ventana y no abrir una pestaña nueva. Puedes copiar el resultado, cerrar la tarjeta o abrirlo en Google Traductor.'
+          ]
+        ]),
+        en: new Map([
+          [normalize(document.getElementById('p1').textContent), normalize(document.getElementById('p1').textContent)],
+          [normalize(document.getElementById('p2').textContent), normalize(document.getElementById('p2').textContent)]
+        ])
+      };
+
       function normalize(text) {
         return String(text || '').replace(/\s+/g, ' ').trim();
       }
 
-      function mockTranslate(text) {
+      function mockTranslate(text, targetLang) {
+        const lang = targetLang || 'tr';
         const selected = normalize(text);
-        if (FULL_TRANSLATIONS.has(selected)) return FULL_TRANSLATIONS.get(selected);
+        const full = FULL_TRANSLATIONS_BY_LANG[lang];
+        if (full && full.has(selected)) return full.get(selected);
+
+        if (lang === 'en') return selected;
 
         const key = selected
           .toLowerCase()
           .replace(/^[.,!?;:'"“”()\[\]]+|[.,!?;:'"“”()\[\]]+$/g, '');
         if (!key) return selected;
 
-        return key
+        const words = lang === 'tr' ? MOCK_WORDS : MOCK_WORDS_BY_LANG[lang];
+        if (!words) return `(${lang}) ${selected}`;
+
+        const translated = key
           .split(/\s+/)
-          .map((word) => MOCK_WORDS[word] || word)
+          .map((word) => words[word] || word)
           .join(' ');
+
+        return lang !== 'tr' && translated === selected
+          ? `(${lang}) ${selected}`
+          : translated;
+      }
+
+      function mockAlternatives(targetLang, key) {
+        const map =
+          targetLang === 'tr'
+            ? MOCK_ALTERNATIVES
+            : MOCK_ALTERNATIVES_BY_LANG[targetLang] || {};
+        return map[key] || [];
       }
 
       window.chrome = {
@@ -195,10 +324,13 @@
                   .toLowerCase()
                   .replace(/^[.,!?;:'"“”()\[\]]+|[.,!?;:'"“”()\[\]]+$/g, '');
                 const singleWord = Boolean(selected) && !/\s/.test(selected);
+                const targetLang = message.targetLang || 'tr';
                 callback({
-                  translated: mockTranslate(message.text),
+                  translated: mockTranslate(message.text, targetLang),
                   detected: 'en',
-                  alternatives: singleWord ? MOCK_ALTERNATIVES[key] || [] : []
+                  alternatives: singleWord
+                    ? mockAlternatives(targetLang, key)
+                    : []
                 });
               }, 350);
             } else if (message.type === 'openTab') {
@@ -211,6 +343,9 @@
           sync: {
             get(defaults, callback) {
               callback(defaults);
+            },
+            set(values, callback) {
+              if (callback) callback();
             }
           },
           onChanged: { addListener() {} }

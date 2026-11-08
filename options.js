@@ -39,7 +39,11 @@ function showStatus(text, isError = false) {
   statusTimer = setTimeout(() => status.classList.remove('show'), 1800);
 }
 
-saveButton.addEventListener('click', async () => {
+saveButton.addEventListener('click', saveSettings);
+select.addEventListener('change', saveSettings);
+autoTranslate.addEventListener('change', saveSettings);
+
+async function saveSettings() {
   saveButton.disabled = true;
   try {
     await chrome.storage.sync.set({
@@ -52,6 +56,6 @@ saveButton.addEventListener('click', async () => {
   } finally {
     saveButton.disabled = false;
   }
-});
+}
 
 loadSettings().catch(() => showStatus('Could not load settings', true));
