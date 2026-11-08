@@ -49,16 +49,12 @@ body {
 }
 
 .logo {
-  display: grid;
-  place-items: center;
+  display: block;
   width: 46px;
   height: 46px;
   flex: none;
-  border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
-  font-size: 24px;
-  font-weight: 700;
+  border-radius: 12px;
+  object-fit: contain;
   box-shadow: 0 6px 18px rgba(26, 115, 232, 0.28);
 }
 

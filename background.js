@@ -28,9 +28,25 @@ chrome.runtime.onInstalled.addListener(() => {
     .then((values) => chrome.storage.sync.set({ ...DEFAULTS, ...values }))
     .catch(() => {});
   recreateMenu();
+  warmupTranslationService();
 });
 
-chrome.runtime.onStartup.addListener(recreateMenu);
+chrome.runtime.onStartup.addListener(() => {
+  recreateMenu();
+  warmupTranslationService();
+});
+
+let warmupPromise = null;
+
+function warmupTranslationService() {
+  if (warmupPromise) return warmupPromise;
+
+  warmupPromise = fetch('https://translate.googleapis.com/generate_204', {
+    cache: 'no-store'
+  }).catch(() => {});
+
+  return warmupPromise;
+}
 
 const POS_NAMES = new Map([
   ['isim', 'noun'],
@@ -220,6 +236,11 @@ function friendlyError(error) {
 }
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message?.type === 'warmup') {
+    warmupTranslationService();
+    return false;
+  }
+
   if (message?.type === 'translate' && typeof message.text === 'string') {
     const text = message.text.slice(0, 5000);
     if (!text.trim()) {

@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.png" alt="Translate Selection logo" width="88" />
+</p>
+
 # Translate Selection
 
 **Select text. Translate it without leaving the page.**

@@ -526,6 +526,49 @@
   let selectionTimer = null;
   let flashTimer = null;
   let repositionScheduled = false;
+  let warmed = false;
+
+  function warmTranslationService() {
+    if (warmed) return;
+    warmed = true;
+
+    try {
+      chrome.runtime.sendMessage({ type: 'warmup' });
+    } catch {
+      /* The extension context may have been reloaded. */
+    }
+
+    try {
+      if (
+        document.head &&
+        !document.head.querySelector('link[data-secili-preconnect]')
+      ) {
+        const link = document.createElement('link');
+        link.rel = 'preconnect';
+        link.href = 'https://translate.googleapis.com';
+        link.crossOrigin = 'anonymous';
+        link.setAttribute('data-secili-preconnect', '');
+        document.head.appendChild(link);
+      }
+    } catch {
+      /* Preconnect is an optional speed-up. */
+    }
+  }
+
+  function installDnsPrefetch() {
+    try {
+      if (!document.head || document.head.querySelector('link[data-secili-dns]')) {
+        return;
+      }
+      const link = document.createElement('link');
+      link.rel = 'dns-prefetch';
+      link.href = '//translate.googleapis.com';
+      link.setAttribute('data-secili-dns', '');
+      document.head.appendChild(link);
+    } catch {
+      /* DNS prefetch is an optional speed-up. */
+    }
+  }
 
   function languageName(code) {
     if (!code) return 'Auto';
@@ -1036,6 +1079,7 @@
 
   function openTranslation(info) {
     if (!info || !info.text) return;
+    warmTranslationService();
     ensureUi();
     hideTrigger();
 
@@ -1172,6 +1216,8 @@
       return;
     }
 
+    warmTranslationService();
+
     if (settings.autoTranslate) {
       openTranslation(info);
       return;
@@ -1288,5 +1334,6 @@
   }
 
   initSettings();
+  installDnsPrefetch();
   installListeners();
 })();
