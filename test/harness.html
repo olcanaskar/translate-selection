@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Translate Selection — local test</title>
+    <style>
+      body {
+        max-width: 760px;
+        margin: 48px auto;
+        padding: 0 20px;
+        background: #fbfbf8;
+        color: #222;
+        font-family: Georgia, "Times New Roman", serif;
+        line-height: 1.75;
+      }
+      h1 {
+        font-size: 28px;
+      }
+      #p1 {
+        padding: 16px;
+        border-left: 4px solid #1a73e8;
+        background: #eef4fe;
+        font-size: 18px;
+      }
+      #p2 {
+        font-size: 17px;
+      }
+      button {
+        padding: 9px 14px;
+        border: 0;
+        border-radius: 8px;
+        background: #222;
+        color: #fff;
+        font: inherit;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      #log {
+        margin-top: 32px;
+        padding: 12px;
+        border-radius: 8px;
+        background: #f0f0ec;
+        font-family: Consolas, monospace;
+        font-size: 12px;
+        white-space: pre-wrap;
+      }
+      .note {
+        color: #666;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Translate Selection — test page</h1>
+    <p class="note">
+      This page is for development only and
+      <strong>does not produce real translations</strong>. It returns a sample
+      result based on the selected text; the mock target language is Turkish.
+      Select the text below, click the “Translate” button, and the in-page
+      translation card should appear. Single-word selections also show sample
+      alternative meanings.
+    </p>
+
+    <p id="p1">
+      The quick brown fox jumps over the lazy dog. This sentence is here to test
+      the inline translation card. Select a word, a phrase, or the whole
+      paragraph and press the blue button.
+    </p>
+
+    <p id="p2">
+      Translations appear in a small card next to the selection. The card should
+      stay inside the viewport and must not open a new tab. You can copy the
+      result, close the card, or open it on Google Translate.
+    </p>
+
+    <button id="selectButton" type="button">Select the text automatically</button>
+    <pre id="log">Ready.</pre>
+
+    <script>
+      const MOCK_WORDS = {
+        select: 'seç',
+        word: 'kelime',
+        phrase: 'ifade',
+        whole: 'tamamı',
+        paragraph: 'paragraf',
+        press: 'bas',
+        the: '(belirli tanımlık)',
+        blue: 'mavi',
+        button: 'düğme',
+        quick: 'hızlı',
+        brown: 'kahverengi',
+        fox: 'tilki',
+        jumps: 'zıplar',
+        over: 'üzerinden',
+        lazy: 'tembel',
+        dog: 'köpek',
+        this: 'bu',
+        sentence: 'cümle',
+        is: 'dir',
+        here: 'burada',
+        to: '-e/-a',
+        test: 'test etmek',
+        inline: 'satır içi',
+        translation: 'çeviri',
+        translations: 'çeviriler',
+        card: 'kart',
+        appear: 'görünür',
+        in: 'içinde',
+        a: 'bir',
+        small: 'küçük',
+        next: 'yanında',
+        selection: 'seçim',
+        should: 'malı/meli',
+        stay: 'kal',
+        inside: 'içinde',
+        viewport: 'görünüm alanı',
+        and: 've',
+        must: 'zorunda',
+        not: 'değil',
+        open: 'aç',
+        new: 'yeni',
+        tab: 'sekme',
+        you: 'sen',
+        can: '-ebilir',
+        copy: 'kopyala',
+        result: 'sonuç',
+        close: 'kapat',
+        it: 'onu',
+        on: 'üzerinde',
+        google: 'Google',
+        translate: 'çevir'
+      };
+
+      const MOCK_ALTERNATIVES = {
+        quick: [{ pos: 'adjective', words: ['çabuk', 'süratli', 'ani'] }],
+        brown: [{ pos: 'adjective', words: ['kahverengimsi', 'esmer'] }],
+        fox: [{ pos: 'noun', words: ['kurnaz kimse'] }],
+        select: [{ pos: 'verb', words: ['seçmek', 'ayırmak', 'tercih etmek'] }],
+        word: [{ pos: 'noun', words: ['sözcük', 'söz', 'haber'] }],
+        phrase: [{ pos: 'noun', words: ['söz öbeği', 'deyim'] }],
+        translation: [{ pos: 'noun', words: ['tercüme'] }],
+        card: [{ pos: 'noun', words: ['kartvizit', 'isim kartı'] }],
+        test: [{ pos: 'verb', words: ['deneme', 'sınav', 'sınamak'] }],
+        button: [{ pos: 'noun', words: ['buton'] }],
+        blue: [{ pos: 'adjective', words: ['mavimsi', 'hüzünlü'] }],
+        small: [{ pos: 'adjective', words: ['ufak', 'minik'] }],
+        result: [{ pos: 'noun', words: ['netice', 'akıbet'] }],
+        close: [{ pos: 'verb', words: ['kapatmak', 'örtmek'] }],
+        open: [{ pos: 'verb', words: ['açmak', 'açık'] }],
+        selection: [{ pos: 'noun', words: ['seçme', 'tercih'] }],
+        viewport: [{ pos: 'noun', words: ['görüntü alanı'] }],
+        translate: [{ pos: 'verb', words: ['tercüme etmek'] }]
+      };
+
+      const FULL_TRANSLATIONS = new Map([
+        [
+          normalize(document.getElementById('p1').textContent),
+          'Hızlı kahverengi tilki tembel köpeğin üzerinden atlar. Bu cümle, sayfa içi çeviri kartını test etmek için burada. Bir kelime, bir ifade veya paragrafın tamamını seçip mavi düğmeye basın.'
+        ],
+        [
+          normalize(document.getElementById('p2').textContent),
+          'Çeviriler seçimin yanındaki küçük bir kartta görünür. Kart görünüm alanının içinde kalmalı ve yeni bir sekme açmamalıdır. Sonucu kopyalayabilir, kartı kapatabilir veya Google Çeviri’de açabilirsiniz.'
+        ]
+      ]);
+
+      function normalize(text) {
+        return String(text || '').replace(/\s+/g, ' ').trim();
+      }
+
+      function mockTranslate(text) {
+        const selected = normalize(text);
+        if (FULL_TRANSLATIONS.has(selected)) return FULL_TRANSLATIONS.get(selected);
+
+        const key = selected
+          .toLowerCase()
+          .replace(/^[.,!?;:'"“”()\[\]]+|[.,!?;:'"“”()\[\]]+$/g, '');
+        if (!key) return selected;
+
+        return key
+          .split(/\s+/)
+          .map((word) => MOCK_WORDS[word] || word)
+          .join(' ');
+      }
+
+      window.chrome = {
+        runtime: {
+          id: 'test-extension',
+          lastError: null,
+          sendMessage(message, callback) {
+            if (message.type === 'translate') {
+              setTimeout(() => {
+                const selected = normalize(message.text);
+                const key = selected
+                  .toLowerCase()
+                  .replace(/^[.,!?;:'"“”()\[\]]+|[.,!?;:'"“”()\[\]]+$/g, '');
+                const singleWord = Boolean(selected) && !/\s/.test(selected);
+                callback({
+                  translated: mockTranslate(message.text),
+                  detected: 'en',
+                  alternatives: singleWord ? MOCK_ALTERNATIVES[key] || [] : []
+                });
+              }, 350);
+            } else if (message.type === 'openTab') {
+              if (callback) callback();
+            }
+          },
+          onMessage: { addListener() {} }
+        },
+        storage: {
+          sync: {
+            get(defaults, callback) {
+              callback(defaults);
+            }
+          },
+          onChanged: { addListener() {} }
+        }
+      };
+    </script>
+    <script src="../languages.js"></script>
+    <script src="../content.js"></script>
+    <script>
+      const paragraph = document.getElementById('p1');
+      const log = document.getElementById('log');
+
+      document.getElementById('selectButton').addEventListener('click', () => {
+        const range = document.createRange();
+        range.selectNodeContents(paragraph);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        paragraph.dispatchEvent(
+          new MouseEvent('mouseup', { bubbles: true, button: 0 })
+        );
+        log.textContent = 'Text selected, mouseup dispatched.';
+      });
+    </script>
+  </body>
+</html>

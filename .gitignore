@@ -1,0 +1,16 @@
+# Build artifacts
+*.zip
+*.crx
+*.pem
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+
+# Logs
+*.log

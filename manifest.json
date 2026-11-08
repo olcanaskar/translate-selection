@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "Translate Selection",
+  "version": "1.2.0",
+  "description": "Translate selected text in a small in-page card without opening a new tab.",
+  "permissions": ["storage", "contextMenus"],
+  "host_permissions": ["https://translate.googleapis.com/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Translate Selection settings"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["languages.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "commands": {
+    "translate-selection": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Translate selected text"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

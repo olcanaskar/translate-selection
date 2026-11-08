@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Translate Selection — live extension test</title>
+    <style>
+      body {
+        max-width: 760px;
+        margin: 48px auto;
+        padding: 0 20px;
+        background: #fbfbf8;
+        color: #222;
+        font-family: Georgia, "Times New Roman", serif;
+        line-height: 1.75;
+      }
+      h1 {
+        font-size: 28px;
+      }
+      #p1 {
+        padding: 16px;
+        border-left: 4px solid #1a73e8;
+        background: #eef4fe;
+        font-size: 18px;
+      }
+      #p2 {
+        font-size: 17px;
+      }
+      button {
+        padding: 9px 14px;
+        border: 0;
+        border-radius: 8px;
+        background: #222;
+        color: #fff;
+        font: inherit;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      #log {
+        margin-top: 32px;
+        padding: 12px;
+        border-radius: 8px;
+        background: #f0f0ec;
+        font-family: Consolas, monospace;
+        font-size: 12px;
+        white-space: pre-wrap;
+      }
+      .note {
+        color: #666;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Translate Selection — live extension test</h1>
+    <p class="note">
+      Used with the real extension loaded. There is no mocked API on this page;
+      translations come from the Google service.
+    </p>
+
+    <p id="p1">
+      The quick brown fox jumps over the lazy dog. This sentence is here to test
+      the inline translation card. Select a word, a phrase, or the whole
+      paragraph and press the blue button.
+    </p>
+
+    <p id="p2">
+      Translations appear in a small card next to the selection. The card should
+      stay inside the viewport and must not open a new tab. You can copy the
+      result, close the card, or open it on Google Translate.
+    </p>
+
+    <button id="selectButton" type="button">Select the text automatically</button>
+    <pre id="log">Ready.</pre>
+
+    <script>
+      const paragraph = document.getElementById('p1');
+      const log = document.getElementById('log');
+
+      document.getElementById('selectButton').addEventListener('click', () => {
+        const range = document.createRange();
+        range.selectNodeContents(paragraph);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        paragraph.dispatchEvent(
+          new MouseEvent('mouseup', { bubbles: true, button: 0 })
+        );
+        log.textContent = 'Text selected, mouseup dispatched.';
+      });
+    </script>
+  </body>
+</html>

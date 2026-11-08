@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Translate Selection — Settings</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main class="wrap">
+      <header class="hero">
+        <div class="logo" aria-hidden="true">T</div>
+        <div>
+          <h1>Translate Selection</h1>
+          <p>Translate selected text without leaving the page.</p>
+        </div>
+      </header>
+
+      <section class="card">
+        <label class="field" for="targetLang">
+          <span class="field-label">Target language</span>
+          <select id="targetLang"></select>
+        </label>
+
+        <label class="check">
+          <input id="autoTranslate" type="checkbox" />
+          <span>
+            <span class="check-title">
+              Open the translation card automatically when I select text
+            </span>
+            <span class="check-hint">
+              When off, a small “Translate” button appears next to your selection.
+            </span>
+          </span>
+        </label>
+
+        <div class="actions">
+          <button id="save" class="save" type="button">Save</button>
+          <span id="status" class="status" role="status" aria-live="polite"></span>
+        </div>
+      </section>
+
+      <section class="card help">
+        <h2>How to use</h2>
+        <ul>
+          <li>Select some text, then click the <strong>Translate</strong> button next to it.</li>
+          <li>
+            You can also press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Y</kbd>.
+          </li>
+          <li>Right-click → <strong>Translate selected text</strong>.</li>
+          <li>
+            Single-word selections also show <strong>other meanings</strong> below
+            the translation.
+          </li>
+        </ul>
+        <p class="note">
+          To change the shortcut, open
+          <code>brave://extensions/shortcuts</code> in Brave.
+        </p>
+
+        <h2>Privacy</h2>
+        <p class="note">
+          Selected text is sent to Google’s translation service to produce a
+          result. Don’t use it with sensitive text.
+        </p>
+      </section>
+
+      <footer class="foot">
+        Version 1.2.0 · Not an official Google extension.
+      </footer>
+    </main>
+
+    <script src="languages.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>
