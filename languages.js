@@ -1,4 +1,5 @@
-/* Shared language list used by both the content script and the options page. */
+/* Shared language list used by both the content script and the options page.
+   Displayed alphabetically by English name. */
 globalThis.SECILI_CEVIRI_LANGUAGES = [
   { code: 'tr', name: 'Turkish' },
   { code: 'en', name: 'English' },
@@ -61,4 +62,4 @@ globalThis.SECILI_CEVIRI_LANGUAGES = [
   { code: 'mt', name: 'Maltese' },
   { code: 'la', name: 'Latin' },
   { code: 'eo', name: 'Esperanto' }
-];
+].sort((a, b) => a.name.localeCompare(b.name, 'en'));
