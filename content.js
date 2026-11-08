@@ -123,14 +123,57 @@
     }
 
     .st-langs {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      flex: 1 1 auto;
       min-width: 0;
       overflow: hidden;
       color: #5f6368;
       font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.03em;
-      text-overflow: ellipsis;
       white-space: nowrap;
+    }
+
+    .st-source {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .st-arrow {
+      flex: none;
+      color: #80868b;
+    }
+
+    .st-target {
+      min-width: 0;
+      max-width: 170px;
+      padding: 3px 14px 3px 3px;
+      border: 0;
+      border-radius: 4px;
+      background-color: transparent;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235f6368' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 2px center;
+      background-size: 8px 8px;
+      color: #1a73e8;
+      font: inherit;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-overflow: ellipsis;
+      cursor: pointer;
+      appearance: none;
+    }
+
+    .st-target:hover {
+      text-decoration: underline;
+    }
+
+    .st-target:focus-visible {
+      outline: 2px solid #a8c7fa;
+      outline-offset: 2px;
     }
 
     .st-btns {
@@ -358,6 +401,15 @@
         color: #9aa0a6;
       }
 
+      .st-arrow {
+        color: #9aa0a6;
+      }
+
+      .st-target {
+        color: #8ab4f8;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239aa0a6' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      }
+
       .st-original {
         border-color: rgba(255, 255, 255, 0.12);
       }
@@ -552,12 +604,22 @@
         if (chrome.runtime.lastError) return;
         settings = { ...DEFAULTS, ...values };
         activeTarget = settings.targetLang || DEFAULTS.targetLang;
+        if (els?.target) {
+          const changed = els.target.value !== activeTarget;
+          els.target.value = activeTarget;
+          if (changed && card && !card.hidden) retranslateCurrent();
+        }
       });
 
       chrome.storage.onChanged.addListener((changes, area) => {
         if (area !== 'sync') return;
         if (changes.targetLang && changes.targetLang.newValue) {
           settings.targetLang = changes.targetLang.newValue;
+          if (els?.target) {
+            const changed = els.target.value !== settings.targetLang;
+            els.target.value = settings.targetLang;
+            if (changed && card && !card.hidden) retranslateCurrent();
+          }
         }
         if (changes.autoTranslate) {
           settings.autoTranslate = Boolean(changes.autoTranslate.newValue);
@@ -630,7 +692,11 @@
     card.setAttribute('aria-label', 'Translation');
     card.innerHTML = `
       <div class="st-head">
-        <span class="st-langs"></span>
+        <div class="st-langs">
+          <span class="st-source"></span>
+          <span class="st-arrow" aria-hidden="true">→</span>
+          <select class="st-target" title="Target language" aria-label="Target language"></select>
+        </div>
         <div class="st-btns">
           <button type="button" class="st-btn" data-action="copy" title="Copy translation" aria-label="Copy translation" disabled>${COPY_SVG}</button>
           <button type="button" class="st-btn" data-action="open" title="Open in Google Translate" aria-label="Open in Google Translate">${OPEN_SVG}</button>
@@ -654,7 +720,8 @@
     shadow.appendChild(card);
 
     els = {
-      langs: card.querySelector('.st-langs'),
+      source: card.querySelector('.st-source'),
+      target: card.querySelector('.st-target'),
       original: card.querySelector('.st-original'),
       result: card.querySelector('.st-result'),
       alts: card.querySelector('.st-alts'),
@@ -663,6 +730,15 @@
       copy: card.querySelector('[data-action="copy"]'),
       open: card.querySelector('[data-action="open"]')
     };
+
+    for (const { code, name } of LANGUAGES) {
+      const option = document.createElement('option');
+      option.value = code;
+      option.textContent = name;
+      els.target.appendChild(option);
+    }
+    els.target.value = settings.targetLang || DEFAULTS.targetLang;
+    els.target.addEventListener('change', handleTargetChange);
 
     for (const type of [
       'mousedown',
@@ -797,7 +873,8 @@
   function renderLoading() {
     card.hidden = false;
     card.setAttribute('aria-busy', 'true');
-    els.langs.textContent = `Auto-detect → ${languageName(activeTarget)}`;
+    els.source.textContent = 'Auto-detect';
+    els.target.value = activeTarget;
     els.original.textContent = lastText;
     els.result.textContent = '';
     els.alts.hidden = true;
@@ -849,12 +926,10 @@
     card.hidden = false;
     card.setAttribute('aria-busy', 'false');
 
-    const sourceName = languageName(response.detected);
-    const targetName = languageName(activeTarget);
-    els.langs.textContent =
-      sourceName === targetName
-        ? `${sourceName} (same language)`
-        : `${sourceName} → ${targetName}`;
+    els.source.textContent = response.detected
+      ? languageName(response.detected)
+      : 'Auto-detect';
+    els.target.value = activeTarget;
     els.original.textContent = lastText;
     els.result.textContent = response.translated;
     renderAlternatives(response.alternatives);
@@ -866,7 +941,8 @@
   function renderError(message) {
     card.hidden = false;
     card.setAttribute('aria-busy', 'false');
-    els.langs.textContent = `Auto-detect → ${languageName(activeTarget)}`;
+    els.source.textContent = 'Auto-detect';
+    els.target.value = activeTarget;
     els.original.textContent = lastText;
     els.result.textContent = '';
     els.alts.hidden = true;
@@ -1005,6 +1081,32 @@
     } catch {
       window.open(url, '_blank', 'noopener,noreferrer');
     }
+  }
+
+  function retranslateCurrent() {
+    if (!lastText) return;
+    openTranslation({
+      text: lastText,
+      rect: currentAnchorRect() || lastAnchorRect,
+      range: lastRange,
+      input: lastInput
+    });
+  }
+
+  function handleTargetChange() {
+    const target = els?.target?.value;
+    if (!target) return;
+
+    settings.targetLang = target;
+    try {
+      chrome.storage.sync.set({ targetLang: target }, () => {
+        void chrome.runtime.lastError;
+      });
+    } catch {
+      /* The setting still applies on this page. */
+    }
+
+    if (card && !card.hidden) retranslateCurrent();
   }
 
   function scheduleSelectionCheck() {

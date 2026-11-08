@@ -15,12 +15,14 @@ to the selection, without leaving the page or opening a new tab.
 - **Copy**, **Open in Google Translate**, **Close**, and **Try again** actions.
 - `Ctrl + Shift + Y` shortcut (`Command + Shift + Y` on macOS) and a right-click
   menu item.
-- Target language and "open automatically on selection" options.
+- Change the target language directly from the translation card or the settings
+  page; the card retranslates immediately.
+- "Open automatically on selection" option.
 - English interface, light/dark theme support, and a Shadow DOM UI that survives
   strict page styles and CSP rules.
 
-The default target language is **Turkish**. You can change it from the settings
-page; the interface remains English.
+The default target language is **Turkish**. Change it from the dropdown in the
+translation card or from the settings page; the interface remains English.
 
 ## Install (Brave)
 
@@ -61,6 +63,8 @@ To change the shortcut, use `brave://extensions/shortcuts` (or
 ## Settings
 
 - **Target language:** Turkish by default. About 60 languages are supported.
+  Change it in the settings page or from the language dropdown in the
+  translation card; the card retranslates immediately.
 - **Automatic open:** When off, a small button appears next to the selection.
   When on, the translation card opens immediately after selecting text.
 
