@@ -3,7 +3,8 @@
 const DEFAULTS = { targetLang: 'tr', autoTranslate: false };
 const MENU_ID = 'secili-ceviri-translate';
 const MAX_ALTERNATIVES = 60;
-const REQUEST_TIMEOUT_MS = 10000;
+const REQUEST_TIMEOUT_MS = 15000;
+const FALLBACK_DELAY_MS = 1200;
 
 function recreateMenu() {
   chrome.contextMenus.removeAll(() => {
@@ -94,25 +95,80 @@ function parseAlternatives(data, primary, source) {
   return groups;
 }
 
-async function requestTranslation(url) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+function requestTranslation(url) {
+  return new Promise((resolve, reject) => {
+    const controllers = new Set();
+    let fallbackTimer = null;
+    let settled = false;
+    let attempts = 0;
+    let failures = 0;
 
-  try {
-    const response = await fetch(url.toString(), {
-      method: 'GET',
-      signal: controller.signal,
-      headers: { Accept: 'application/json' }
-    });
+    const cleanup = () => {
+      if (fallbackTimer !== null) {
+        clearTimeout(fallbackTimer);
+        fallbackTimer = null;
+      }
+      for (const controller of controllers) controller.abort();
+      controllers.clear();
+    };
 
-    if (!response.ok) {
-      throw new Error(`Google Translate responded with HTTP ${response.status}.`);
-    }
+    const fail = (error) => {
+      failures += 1;
+      if (settled) return;
 
-    return await response.json();
-  } finally {
-    clearTimeout(timeout);
-  }
+      if (fallbackTimer !== null) {
+        clearTimeout(fallbackTimer);
+        fallbackTimer = null;
+        start();
+        return;
+      }
+
+      if (failures >= attempts) {
+        settled = true;
+        cleanup();
+        reject(error);
+      }
+    };
+
+    const start = () => {
+      if (settled) return;
+      attempts += 1;
+
+      const controller = new AbortController();
+      controllers.add(controller);
+      const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+      fetch(url.toString(), {
+        method: 'GET',
+        signal: controller.signal,
+        headers: { Accept: 'application/json' }
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Google Translate responded with HTTP ${response.status}.`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          clearTimeout(timeout);
+          if (settled) return;
+          settled = true;
+          cleanup();
+          resolve(data);
+        })
+        .catch((error) => {
+          clearTimeout(timeout);
+          controllers.delete(controller);
+          fail(error);
+        });
+    };
+
+    start();
+    fallbackTimer = setTimeout(() => {
+      fallbackTimer = null;
+      start();
+    }, FALLBACK_DELAY_MS);
+  });
 }
 
 async function translateText(text, targetLang) {
@@ -126,13 +182,7 @@ async function translateText(text, targetLang) {
   if (dictionaryTerm) url.searchParams.append('dt', 'bd');
   url.searchParams.set('q', text);
 
-  let data;
-  try {
-    data = await requestTranslation(url);
-  } catch (error) {
-    if (error?.name !== 'AbortError') throw error;
-    data = await requestTranslation(url);
-  }
+  const data = await requestTranslation(url);
 
   const translated = Array.isArray(data?.[0])
     ? data[0]
