@@ -1,145 +1,126 @@
 # Translate Selection
 
-A Brave / Chromium extension that translates selected text in a small card next
-to the selection, without leaving the page or opening a new tab.
+**Select text. Translate it without leaving the page.**
 
-![Translate Selection preview](docs/preview.png)
+[**Download the latest release**](https://github.com/olcanaskar/translate-selection/releases/latest/download/translate-selection.zip) ·
+[Privacy Policy](https://olcanaskar.github.io/translate-selection/privacy.html) ·
+[Report an issue](https://github.com/olcanaskar/translate-selection/issues)
 
-## Features
+<p align="center">
+  <img src="docs/screenshot-dark.png" alt="Translate Selection dark theme" width="49%" />
+  <img src="docs/screenshot-light.png" alt="Translate Selection light theme" width="49%" />
+</p>
 
-- Shows a small **Translate** button next to selected text.
-- Opens the translation card on the same page.
-- Shows the original text, the translation, and the language pair.
-- For single-word selections, also lists other meanings grouped by part of
-  speech after the primary translation.
-- **Copy**, **Open in Google Translate**, **Close**, and **Try again** actions.
-- `Ctrl + Shift + Y` shortcut (`Command + Shift + Y` on macOS) and a right-click
-  menu item.
-- Change the target language directly from the translation card or the settings
-  page; the card retranslates immediately.
-- "Open automatically on selection" option.
-- English interface, light/dark theme support, and a Shadow DOM UI that survives
-  strict page styles and CSP rules.
+Translate Selection is a free, open-source translation extension for Brave,
+Chrome, Edge, and other Chromium browsers. Select a word or a sentence and get a
+compact translation card right where you are — no new tab, no account, no ads,
+no tracking.
 
-The default target language is **Turkish**. Change it from the dropdown in the
-translation card or from the settings page; the interface remains English.
+## Why you'll like it
 
-## Install (Brave)
+- **Translate in place.** A small **Translate** button appears next to your
+  selection and opens the result on the same page.
+- **Understand words better.** Single-word selections show the main translation
+  first and other meanings grouped by part of speech.
+- **Switch languages instantly.** Change the target language from the card;
+  the current selection is translated again immediately.
+- **Nearly 60 languages.** The language list is sorted alphabetically.
+- **Dark and light themes.** The interface follows your system theme.
+- **Keyboard and right-click support.** Use `Ctrl + Shift + Y`
+  (`Command + Shift + Y` on macOS), or right-click and choose **Translate
+  selected text**.
+- **Privacy-minded.** Selected text is sent to Google Translate only when you
+  ask for a translation. There are no analytics, ads, or developer servers.
 
-### From source
+The interface is English. The default target language is **Turkish**.
 
-1. Clone the repository:
+## Install
 
-   ```powershell
-   git clone https://github.com/olcanaskar/translate-selection.git
-   ```
+### Brave, Chrome, or Edge (free GitHub release)
 
-2. Open `brave://extensions`.
-3. Turn on **Developer mode** in the top-right corner.
-4. Click **Load unpacked**.
-5. Select the cloned `translate-selection` folder.
+> This project is distributed through GitHub Releases instead of the Chrome Web
+> Store. Installation takes about a minute and does not require a paid account.
 
-There is no build step. Refresh tabs that were already open; the content script
-is only added to new or reloaded pages.
+1. [**Download the latest release ZIP**](https://github.com/olcanaskar/translate-selection/releases/latest/download/translate-selection.zip).
+2. Extract the ZIP to a folder you will keep, for example
+   `Documents\TranslateSelection`. Do not delete this folder afterwards.
+3. Open your browser's extensions page:
+   - Brave: `brave://extensions`
+   - Chrome: `chrome://extensions`
+   - Edge: `edge://extensions`
+4. Turn on **Developer mode**.
+5. Click **Load unpacked** and select the extracted folder (the folder that
+   contains `manifest.json`).
+6. Refresh tabs that were already open. Pin **Translate Selection** to the
+   toolbar if you want quick access to settings.
 
-> Brave may show a developer-mode extension warning from time to time. That is
-> normal. The extension also works in Chrome, Edge, and other Chromium-based
-> browsers.
+That's it. Select some text on any page and click **Translate**.
 
-## Usage
+> Browsers may show a developer-mode extension notice. This is normal for
+> unpacked extensions. If the browser disables the extension after a restart,
+> open the extensions page and enable it again.
 
-- **Mouse:** Select some text, then click the **Translate** button next to it.
-- **Keyboard:** Select text and press `Ctrl + Shift + Y`
-  (`Command + Shift + Y` on macOS).
-- **Right-click:** Select text, right-click, then choose **Translate selected
-  text**.
-- **Settings:** Click the extension icon in the toolbar, or open
-  `brave://extensions` → Translate Selection → **Extension options**.
+## How to use it
 
-To change the shortcut, use `brave://extensions/shortcuts` (or
-`chrome://extensions/shortcuts` in Chrome). Brave already reserves
-`Alt + Shift + T` for focusing the toolbar, so the default is `Ctrl + Shift + Y`.
+1. **Select text** on any web page.
+2. Click the **Translate** button next to the selection, press
+   `Ctrl + Shift + Y`, or right-click and choose **Translate selected text**.
+3. Read the translation in the card. You can copy it, open it in Google
+   Translate, or close the card.
+4. Change the target language from the dropdown in the card. The card
+   re-translates immediately and remembers your choice.
 
-## Settings
-
-- **Target language:** Turkish by default. About 60 languages are supported.
-  Change it in the settings page or from the language dropdown in the
-  translation card; the card retranslates immediately.
-- **Automatic open:** When off, a small button appears next to the selection.
-  When on, the translation card opens immediately after selecting text.
-
-Changes on the settings page are saved automatically.
-
-## How it works
-
-- `manifest.json`: Manifest V3 definition.
-- `background.js`: Sends translation requests to the Google Translate endpoint
-  and manages the context menu and keyboard shortcut.
-- `languages.js`: Shared language list.
-- `content.js`: Selection detection plus the in-page button and card UI
-  (isolated from page styles with Shadow DOM).
-- `options.html/css/js`: Settings page.
-- `icons/`: Extension icons.
-- `docs/preview.png`: Screenshot used in this README.
-- `test/harness.html`: Local UI test page that calls the same Google endpoint
-  and falls back to sample data if the request fails.
-- `test/live.html`: End-to-end test page with the real extension loaded.
-- `test/live-csp.html`: Verifies the UI on pages with a strict Content Security
-  Policy.
-- `tools/make-icons.ps1`: Regenerates the icons.
-
-Translation uses this unofficial public endpoint:
-
-```text
-https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=tr&dt=t&q=...
-```
-
-This endpoint is not officially documented by Google and may change or be
-restricted in the future. The extension only sends the selected text to the
-translation service; it does not collect any other data. Do not use it with
-sensitive text.
-
-For a single word, the extension also requests `dt=bd`; Google returns
-dictionary entries grouped by part of speech, which are displayed under
-**Other meanings** after the primary translation.
-
-## Development
-
-Syntax checks:
-
-```powershell
-node --check background.js
-node --check content.js
-node --check languages.js
-node --check options.js
-```
-
-UI test: open `test/harness.html` and click **Select the text automatically**.
-That page calls the same Google endpoint as the extension and falls back to
-sample data if the request fails; it does not require the extension to be
-installed.
-
-For a real extension test, start a small local server from the project folder:
-
-```powershell
-python -m http.server 8765
-```
-
-Then open `http://127.0.0.1:8765/test/live.html`. The `test/live-csp.html` page
-checks that the UI still renders on pages with a strict CSP.
-
-## Known limitations
-
-- Does not run on internal pages such as `brave://` or `chrome://` (the browser
-  does not allow it).
-- Selections longer than 1500 characters do not show the translate button.
-- Selections inside iframes are not supported.
-- If the Google endpoint is unreachable, the card shows an error message.
-
-## License
-
-MIT
+Open the extension settings from the toolbar icon. There you can choose the
+default target language and enable automatic translation when you select text.
 
 ## Privacy
 
-Read the [Privacy Policy](https://olcanaskar.github.io/translate-selection/privacy.html).
+Translation requests are sent to Google Translate only when you explicitly
+request a translation. The extension does not run analytics, display ads, or
+store selected text on a developer server. Your target-language preference is
+stored in browser sync storage.
+
+Read the full [Privacy Policy](https://olcanaskar.github.io/translate-selection/privacy.html).
+
+## FAQ
+
+**Is it free?**
+Yes. The source code is on GitHub and the installable package is a free GitHub
+release.
+
+**Why is it not on the Chrome Web Store?**
+The Chrome Web Store requires a paid developer registration. This project is
+distributed directly through GitHub Releases instead.
+
+**Does it work in Brave, Chrome, and Edge?**
+Yes. It uses Manifest V3 and works in Chromium-based desktop browsers.
+
+**Does it read all the pages I visit?**
+The content script adds the in-page Translate button and card, but the extension
+only reads the text you select when you ask for a translation. It does not
+collect browsing history or page URLs.
+
+**Does it need an internet connection?**
+Yes. Translations and alternative meanings come from Google Translate.
+
+**What happens if a translation fails?**
+The card shows the error and a **Try again** button.
+
+## Updating
+
+1. Download the latest release ZIP.
+2. Extract it over the same folder you used before.
+3. Open `brave://extensions` (or the matching page) and click the reload icon on
+   Translate Selection.
+4. Refresh your tabs.
+
+Keeping the same folder preserves the extension's settings.
+
+## Development
+
+Technical notes, file structure, local testing, and release packaging are in
+[DEVELOPMENT.md](DEVELOPMENT.md).
+
+## License
+
+MIT. Not affiliated with or endorsed by Google.

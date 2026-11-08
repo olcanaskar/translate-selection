@@ -3,25 +3,33 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Translate Selection</title>
+    <title>Translate Selection — In-page translator for Brave & Chrome</title>
+    <meta
+      name="description"
+      content="Translate selected text in a small in-page card. Free, open source, and works in Brave, Chrome, and Edge."
+    />
     <style>
       :root {
         color-scheme: light dark;
-        --bg: #f7f8fa;
+        --bg: #f5f7fa;
+        --card: #ffffff;
         --text: #202124;
         --muted: #5f6368;
-        --accent: #1a73e8;
-        --card: #ffffff;
         --border: rgba(60, 64, 67, 0.14);
+        --accent: #1a73e8;
+        --accent-strong: #1765cc;
+        --shadow: 0 14px 40px rgba(32, 33, 36, 0.1);
       }
       @media (prefers-color-scheme: dark) {
         :root {
           --bg: #17181a;
+          --card: #202124;
           --text: #e8eaed;
           --muted: #9aa0a6;
-          --accent: #8ab4f8;
-          --card: #202124;
           --border: rgba(255, 255, 255, 0.12);
+          --accent: #8ab4f8;
+          --accent-strong: #aecbfa;
+          --shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
         }
       }
       * { box-sizing: border-box; }
@@ -30,62 +38,244 @@
         background: var(--bg);
         color: var(--text);
         font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+        line-height: 1.6;
       }
-      main {
-        width: min(720px, calc(100% - 32px));
-        margin: 48px auto;
-        padding: 32px;
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        background: var(--card);
-        box-shadow: 0 10px 30px rgba(32, 33, 36, 0.08);
+      .wrap {
+        width: min(980px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 56px 0 64px;
+      }
+      .hero {
+        max-width: 680px;
+        margin: 0 auto 36px;
         text-align: center;
       }
       .logo {
         display: grid;
         place-items: center;
-        width: 64px;
-        height: 64px;
-        margin: 0 auto 18px;
+        width: 68px;
+        height: 68px;
+        margin: 0 auto 20px;
         border-radius: 50%;
         background: var(--accent);
         color: #fff;
-        font-size: 32px;
+        font-size: 34px;
         font-weight: 700;
+        box-shadow: 0 8px 24px rgba(26, 115, 232, 0.3);
       }
-      h1 { margin: 0 0 8px; font-size: 26px; }
-      p { color: var(--muted); line-height: 1.6; }
-      nav {
+      h1 {
+        margin: 0 0 10px;
+        font-size: clamp(30px, 5vw, 46px);
+        line-height: 1.1;
+        letter-spacing: -0.025em;
+      }
+      .lead {
+        margin: 0 auto 24px;
+        color: var(--muted);
+        font-size: clamp(15px, 2vw, 17px);
+      }
+      .actions {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
-        gap: 12px;
-        margin-top: 24px;
+        gap: 10px;
       }
-      a {
-        padding: 9px 14px;
+      .button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 18px;
         border: 1px solid var(--border);
-        border-radius: 999px;
-        color: var(--accent);
-        font-size: 13px;
+        border-radius: 10px;
+        color: var(--text);
+        font-size: 14px;
         font-weight: 600;
         text-decoration: none;
+        transition: background-color 0.15s ease, border-color 0.15s ease;
       }
-      a:hover { border-color: var(--accent); }
+      .button:hover { border-color: var(--accent); }
+      .button.primary {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: #fff;
+      }
+      .button.primary:hover { background: var(--accent-strong); }
+      .shot {
+        margin: 36px 0 52px;
+        padding: 10px;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        background: var(--card);
+        box-shadow: var(--shadow);
+      }
+      .shot img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+      }
+      .caption {
+        margin: 10px 4px 2px;
+        color: var(--muted);
+        font-size: 12px;
+        text-align: center;
+      }
+      section { margin-top: 44px; }
+      h2 { margin: 0 0 16px; font-size: 22px; letter-spacing: -0.01em; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+      }
+      .feature {
+        padding: 18px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: var(--card);
+      }
+      .feature h3 { margin: 0 0 6px; font-size: 14px; }
+      .feature p { margin: 0; color: var(--muted); font-size: 13px; }
+      ol.steps {
+        margin: 0;
+        padding-left: 22px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      ol.steps li { margin: 8px 0; }
+      ol.steps strong { color: var(--text); }
+      code {
+        padding: 2px 6px;
+        border-radius: 5px;
+        background: var(--bg);
+        color: var(--text);
+        font-size: 12.5px;
+      }
+      .note {
+        margin-top: 16px;
+        padding: 12px 14px;
+        border-left: 3px solid var(--accent);
+        border-radius: 4px;
+        background: var(--card);
+        color: var(--muted);
+        font-size: 12.5px;
+      }
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-top: 12px;
+        font-size: 13px;
+      }
+      .links a { color: var(--accent); }
+      footer {
+        margin-top: 56px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 12px;
+        text-align: center;
+      }
     </style>
   </head>
   <body>
-    <main>
-      <div class="logo" aria-hidden="true">T</div>
-      <h1>Translate Selection</h1>
-      <p>
-        Translate selected text in a small in-page card. See other meanings and
-        switch target languages instantly.
-      </p>
-      <nav>
-        <a href="https://github.com/olcanaskar/translate-selection">GitHub</a>
-        <a href="./privacy.html">Privacy Policy</a>
-      </nav>
+    <main class="wrap">
+      <header class="hero">
+        <div class="logo" aria-hidden="true">T</div>
+        <h1>Translate Selection</h1>
+        <p class="lead">
+          Select text. Translate it without leaving the page. A free, open-source
+          in-page translator for Brave, Chrome, and Edge.
+        </p>
+        <div class="actions">
+          <a
+            class="button primary"
+            href="https://github.com/olcanaskar/translate-selection/releases/latest/download/translate-selection.zip"
+          >
+            Download for free
+          </a>
+          <a class="button" href="https://github.com/olcanaskar/translate-selection">
+            View on GitHub
+          </a>
+        </div>
+      </header>
+
+      <div class="shot">
+        <img
+          src="screenshot-light.png"
+          alt="Translation card showing the Turkish translation of the word permission"
+        />
+        <p class="caption">
+          Translation card with the target language selector and other meanings.
+        </p>
+      </div>
+
+      <section>
+        <h2>Why Translate Selection?</h2>
+        <div class="grid">
+          <div class="feature">
+            <h3>No new tabs</h3>
+            <p>A compact card appears next to the text you selected.</p>
+          </div>
+          <div class="feature">
+            <h3>Other meanings</h3>
+            <p>Single words also show dictionary meanings grouped by type.</p>
+          </div>
+          <div class="feature">
+            <h3>Quick language switch</h3>
+            <p>Change the target language from the card and retranslate instantly.</p>
+          </div>
+          <div class="feature">
+            <h3>Nearly 60 languages</h3>
+            <p>An alphabetical language list with light and dark themes.</p>
+          </div>
+          <div class="feature">
+            <h3>Keyboard and context menu</h3>
+            <p>Use Ctrl + Shift + Y or right-click the selected text.</p>
+          </div>
+          <div class="feature">
+            <h3>Privacy-minded</h3>
+            <p>Only selected text is sent, and only when you request a translation.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Install in about a minute</h2>
+        <ol class="steps">
+          <li>
+            <a href="https://github.com/olcanaskar/translate-selection/releases/latest/download/translate-selection.zip">
+              Download the latest release ZIP
+            </a>
+            and extract it to a folder you will keep.
+          </li>
+          <li>Open <code>brave://extensions</code> (or the matching page for your browser).</li>
+          <li>Turn on <strong>Developer mode</strong> and click <strong>Load unpacked</strong>.</li>
+          <li>Select the extracted folder, then refresh open tabs.</li>
+        </ol>
+        <p class="note">
+          The Chrome Web Store requires a paid developer registration. This
+          project is distributed as a free GitHub release instead. Browsers may
+          show a developer-mode extension notice; this is normal.
+        </p>
+      </section>
+
+      <section>
+        <h2>Privacy</h2>
+        <p class="lead" style="margin: 0; max-width: none">
+          No analytics, ads, accounts, or developer servers. Selected text is
+          sent to Google Translate only when you ask for a translation. Your
+          target language is stored in browser sync storage.
+        </p>
+        <div class="links">
+          <a href="privacy.html">Read the privacy policy</a>
+          <a href="https://github.com/olcanaskar/translate-selection/issues">Report an issue</a>
+          <a href="https://github.com/olcanaskar/translate-selection">Source code</a>
+        </div>
+      </section>
+
+      <footer>
+        Free and open source · MIT License · Not affiliated with Google
+      </footer>
     </main>
   </body>
 </html>
