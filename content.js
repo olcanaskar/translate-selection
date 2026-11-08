@@ -52,24 +52,26 @@
       gap: 5px;
       height: 30px;
       padding: 0 10px 0 8px;
-      border: 0;
+      border: 1px solid rgba(60, 64, 67, 0.14);
       border-radius: 999px;
-      background: #1a73e8;
-      color: #fff;
+      background: #fff;
+      color: #202124;
       font-size: 12px;
       font-weight: 600;
       line-height: 1;
       letter-spacing: 0.01em;
-      box-shadow: 0 2px 8px rgba(26, 115, 232, 0.35), 0 1px 2px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 16px rgba(32, 33, 36, 0.16), 0 1px 3px rgba(32, 33, 36, 0.08);
       cursor: pointer;
       pointer-events: auto;
       user-select: none;
-      transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+      transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease,
+        box-shadow 0.15s ease;
     }
 
     .st-trigger:hover {
-      background: #1765cc;
-      box-shadow: 0 3px 12px rgba(26, 115, 232, 0.45), 0 1px 2px rgba(0, 0, 0, 0.2);
+      border-color: rgba(60, 64, 67, 0.22);
+      background: #f8f9fa;
+      box-shadow: 0 6px 20px rgba(32, 33, 36, 0.2), 0 1px 3px rgba(32, 33, 36, 0.08);
     }
 
     .st-trigger:active {
@@ -404,6 +406,19 @@
         background: #202124;
         color: #e8eaed;
         box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .st-trigger {
+        border-color: rgba(255, 255, 255, 0.12);
+        background: #202124;
+        color: #e8eaed;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.3);
+      }
+
+      .st-trigger:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+        background: #303134;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.3);
       }
 
       .st-langs,
